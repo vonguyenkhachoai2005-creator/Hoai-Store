@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ Hàng - Hoai Store</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+    <header class="bg-red-600 shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="index.html" class="text-2xl font-bold flex items-center gap-2 text-white">
+                <i class="fa-solid fa-laptop text-white"></i> Hoai Store
+            </a>
+            <a href="index.html" class="text-sm bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Tiếp tục mua sắm
+            </a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-4xl mx-auto">
+            <h2 class="text-xl font-bold mb-6 text-red-600 flex items-center gap-2 border-b pb-3 border-gray-100">
+                <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng của bạn
+            </h2>
+            <div id="cartContent"></div>
+        </section>
+    </main>
+
+    <script>
+        function formatMoney(num) { return num.toLocaleString('vi-VN') + ' đ'; }
+        function getCart() { return JSON.parse(localStorage.getItem('cps_cart')) || []; }
+        function saveCart(cart) { localStorage.setItem('cps_cart', JSON.stringify(cart)); }
+
+        function removeCartItem(id) {
+            let cart = getCart().filter(item => item.id !== id);
+            saveCart(cart); renderCartPage();
+        }
+
+        window.changeQuantity = function(id, delta) {
+            let cart = getCart();
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+            item.quantity += delta;
+            if (item.quantity <= 0) { cart = cart.filter(i => i.id !== id); }
+            saveCart(cart); renderCartPage();
+        }
+
+        function renderCartPage() {
+            const cart = getCart();
+            const cartContent = document.getElementById('cartContent');
+
+            if (cart.length === 0) {
+                cartContent.innerHTML = `
+                    <div class="text-center py-12 text-gray-400">
+                        <i class="fa-solid fa-box-open text-5xl mb-3"></i>
+                        <p class="text-base mb-4">Giỏ hàng của bạn đang trống.</p>
+                        <a href="index.html" class="inline-block bg-red-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-red-700 transition">Quay lại trang chủ</a>
+                    </div>`;
+                return;
+            }
+
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            let html = `
+                <div class="space-y-4">
+                    ${cart.map(item => `
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-100 pb-4 gap-4">
+                            <div class="flex items-center gap-4">
+                                <img src="${item.img}" class="w-20 h-20 object-cover rounded-md border">
+                                <div>
+                                    <h4 class="font-bold text-sm text-gray-900">${item.name}</h4>
+                                    <p class="text-sm text-red-600 font-semibold mt-1">${formatMoney(item.price)}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between w-full sm:w-auto gap-6 border-t sm:border-none pt-3 sm:pt-0">
+                                <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
+                                    <button onclick="changeQuantity(${item.id}, -1)" class="px-3 py-1 text-gray-600 hover:bg-gray-200 font-bold cursor-pointer">-</button>
+                                    <span class="px-4 py-1 text-sm bg-white font-medium min-w-[40px] text-center">${item.quantity}</span>
+                                    <button onclick="changeQuantity(${item.id}, 1)" class="px-3 py-1 text-gray-600 hover:bg-gray-200 font-bold cursor-pointer">+</button>
+                                </div>
+                                <div class="text-sm font-bold text-gray-700 hidden md:block">
+                                    Thành tiền: ${formatMoney(item.price * item.quantity)}
+                                </div>
+                                <button onclick="removeCartItem(${item.id})" class="text-gray-400 hover:text-red-600 text-lg p-2 cursor-pointer">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="text-center sm:text-left">
+                        <span class="text-gray-500 text-sm">Tổng tiền thanh toán:</span>
+                        <div class="text-2xl font-black text-red-600 mt-1">${formatMoney(totalPrice)}</div>
+                    </div>
+                    <button onclick="alert('Đã xác nhận đơn hàng!'); localStorage.removeItem('cps_cart'); renderCartPage();" 
+                            class="w-full sm:w-auto bg-red-600 text-white font-bold px-10 py-3.5 rounded-xl shadow-md hover:bg-red-700 transition cursor-pointer text-center block">
+                        XÁC NHẬN ĐẶT HÀNG
+                    </button>
+                </div>
+            `;
+            cartContent.innerHTML = html;
+        }
+
+        renderCartPage();
+    </script>
+</body>
+</html>

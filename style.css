@@ -1,0 +1,29 @@
+
+.bg-cps-red { 
+    background-color: #d70018 !important; 
+}
+.text-cps-red { 
+    color: #d70018 !important; 
+}
+.border-cps-red { 
+    border-color: #d70018 !important; 
+}
+
+
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+.toast-msg {
+    animation: slideIn 0.3s ease-out, fadeOut 0.5s ease-in 2.5s forwards;
+}
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}

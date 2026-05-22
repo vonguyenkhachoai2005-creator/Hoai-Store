@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Sản Phẩm - Hoai Store</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+    <header class="bg-red-600 shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="index.html" class="text-2xl font-bold flex items-center gap-2 text-white">
+                <i class="fa-solid fa-laptop text-white"></i> Hoai Store
+            </a>
+            <a href="index.html" class="text-sm bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
+                <i class="fa-solid fa-house"></i> Về trang chủ
+            </a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-5xl">
+        <div id="productDetailContent" class="bg-white rounded-xl shadow-xs border border-gray-100 p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+            </div>
+    </main>
+
+    <script>
+        const products = [
+            { id: 1, name: 'MacBook Air M2 2023 (8GB/256GB)', price: 24990000, img: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80', cpu: 'Apple M2 8-core', ram: '8GB', ssd: '256GB SSD', screen: '13.6 inch Liquid Retina' },
+            { id: 2, name: 'ASUS ROG Strix G16 Gaming', price: 32490000, img: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=500&q=80', cpu: 'Intel Core i7-13650HX', ram: '16GB DDR5', ssd: '512GB SSD NVMe', screen: '16 inch FHD+ 165Hz' },
+            { id: 3, name: 'Dell XPS 13 Plus 9320', price: 41990000, img: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=500&q=80', cpu: 'Intel Core i7-1260P', ram: '16GB LPDDR5', ssd: '1TB SSD', screen: '13.4 inch UHD+ Touch' },
+            { id: 4, name: 'HP Pavilion 14 X360 Cam Ứng', price: 16290000, img: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500&q=80', cpu: 'Intel Core i5-1335U', ram: '8GB DDR4', ssd: '512GB SSD', screen: '14 inch FHD Cảm ứng xoay 360' }
+        ];
+
+        function formatMoney(num) { return num.toLocaleString('vi-VN') + ' đ'; }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = parseInt(urlParams.get('id'));
+        const product = products.find(p => p.id === productId);
+        const container = document.getElementById('productDetailContent');
+
+        if (!product) {
+            container.innerHTML = `<p class="text-center col-span-2 text-gray-500 py-12">Không tìm thấy sản phẩm này.</p>`;
+        } else {
+            container.innerHTML = `
+                <div>
+                    <img src="${product.img}" alt="${product.name}" class="w-full h-80 object-cover rounded-xl border">
+                </div>
+                <div class="flex flex-col justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900 mb-2">${product.name}</h1>
+                        <p class="text-2xl font-black text-red-600 mb-6">${formatMoney(product.price)}</p>
+                        
+                        <div class="bg-gray-50 p-4 rounded-xl mb-6">
+                            <h3 class="font-bold text-sm text-gray-800 mb-2 uppercase">Thông số kỹ thuật</h3>
+                            <table class="w-full text-sm text-left text-gray-600">
+                                <tr><td class="font-semibold py-1 w-24">Bộ xử lý:</td><td>${product.cpu}</td></tr>
+                                <tr><td class="font-semibold py-1">Bộ nhớ RAM:</td><td>${product.ram}</td></tr>
+                                <tr><td class="font-semibold py-1">Ổ cứng:</td><td>${product.ssd}</td></tr>
+                                <tr><td class="font-semibold py-1">Màn hình:</td><td>${product.screen}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <button onclick="addToCart(${product.id})" class="w-full bg-red-600 text-white font-bold py-3.5 rounded-xl shadow-md hover:bg-red-700 transition cursor-pointer text-center block">
+                        <i class="fa-solid fa-cart-plus mr-2"></i> THÊM VÀO GIỎ HÀNG NGAY
+                    </button>
+                </div>
+            `;
+        }
+
+        function addToCart(id) {
+            let cart = JSON.parse(localStorage.getItem('cps_cart')) || [];
+            const p = products.find(prod => prod.id === id);
+            const exist = cart.find(item => item.id === id);
+            if (exist) { exist.quantity += 1; } else { cart.push({ ...p, quantity: 1 }); }
+            localStorage.setItem('cps_cart', JSON.stringify(cart));
+            alert(`Đã thêm vào giỏ hàng thành công! Bạn có thể chuyển sang trang giỏ hàng để kiểm tra.`);
+        }
+    </script>
+</body>
+</html>
